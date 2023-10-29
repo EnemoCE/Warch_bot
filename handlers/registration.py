@@ -9,13 +9,10 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from filters.registration_filters import PasswordFilter
 from db.ops import user_exists, create_user
 from aiogram.utils.markdown import hbold
+from handlers.states import Registration, UniversalEndState
 
 
 router = Router()
-
-class Registration(StatesGroup):
-    waiting_for_name = State()
-    waiting_for_password = State()
 
 
 @router.message(Command("start"))
@@ -26,6 +23,7 @@ async def on_start(message: Message, state: FSMContext, session_maker):
         await message.answer("Please enter your name:")
         await state.set_state(Registration.waiting_for_name)
     else:
+        await state.set_state(UniversalEndState.end_state)
         message.reply(f"Hello, {hbold(message.from_user.full_name)}!")
 
 
@@ -51,6 +49,7 @@ async def process_password(message: Message, state: FSMContext, session_maker):
     password = message.text
     await create_user(chat_id, user_name, password, session_maker)
     await state.clear()
+    await state.set_state(UniversalEndState.end_state)
 
 router.message(lambda message: not message.text, Registration.waiting_for_password)
 async def process_password_invalid(message: Message):

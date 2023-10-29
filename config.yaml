@@ -1,0 +1,1 @@
+DB_PATH:  'postgresql+asyncpg://user:password@localhost/dbname'

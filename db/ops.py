@@ -23,7 +23,6 @@ async def user_exists(chat_id, session_maker) -> bool:
     async with session_maker() as session:
         stmt = select(User).where(User.chat_id == chat_id)
         result = await session.execute(stmt)
-        print(result)
         return result.scalar_one_or_none()
 
 
